@@ -240,18 +240,32 @@ export default class GeoJsonLayer extends Layer {
     const rScale =
       radiusField &&
       this.getVisChannelScale(radiusScale, radiusDomain, radiusRange);
+    
+    // get all the field
+    const fields = [];
+    Object.keys(allData[0][0].properties).forEach(key => {
+      fields.push(key);
+    });
 
     return {
       data: geojsonData,
       getFeature,
-      getFillColor: d =>
-        cScale
+      getFillColor: d => {
+        const obj = [];
+        obj[0] = d;
+        for (let i = 0; i < fields.length; i++) {
+          obj.push(d.properties[fields[i]]);
+        }
+        return cScale
           ? this.getEncodedChannelValue(
               cScale,
-              allData[d.properties.index],
+              // if it's tiled data, allData only contains a sample
+              // we need to calculate the correct data
+              allData[d.properties.index] || obj, 
               colorField
             )
-          : d.properties.fillColor || color,
+          : d.properties.fillColor || color
+      },
       getLineColor: d =>
         cScale
           ? this.getEncodedChannelValue(
@@ -278,15 +292,21 @@ export default class GeoJsonLayer extends Layer {
               0
             )
           : d.properties.elevation || 500,
-      getRadius: d =>
-        rScale
+      getRadius: d => {
+        const obj = [];
+        obj[0] = d;
+        fields.forEach(field => {
+          obj.push(d.properties[field]);
+        });
+        return rScale
           ? this.getEncodedChannelValue(
               rScale,
-              allData[d.properties.index],
+              allData[d.properties.index] || obj,
               radiusField,
               0
             )
           : d.properties.radius || 1
+      }
     };
   }
 

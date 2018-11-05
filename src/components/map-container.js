@@ -40,6 +40,7 @@ import {transformRequest} from 'utils/map-style-utils/mapbox-utils';
 
 // default-settings
 import {LAYER_BLENDINGS} from 'constants/default-settings';
+import SharedstreetsLayer from 'deckgl-layers/sharedstreets-layer/sharedstreets-layer';
 
 const MAP_STYLE = {
   container: {
@@ -337,17 +338,41 @@ export default function MapContainerFactory(MapPopover, MapControl) {
           .reduce(this._renderLayer, []);
       }
 
+      const tiledDataLayers = deckGlLayers.filter(layer => {
+        // TODO
+        return true;
+      });
+
+      const layersToRender = deckGlLayers.filter(layer => {
+        // TODO
+        return false;
+      });
+
+      layersToRender.push(this._renderSharedstreetsLayer(tiledDataLayers));
+
       return (
         <DeckGL
           viewState={mapState}
           id="default-deckgl-overlay"
-          layers={deckGlLayers}
+          layers={layersToRender}
           onWebGLInitialized={this._onWebGLInitialized}
           onBeforeRender={this._onBeforeRender}
           onLayerHover={visStateActions.onLayerHover}
           onLayerClick={visStateActions.onLayerClick}
         />
       );
+    }
+
+    _renderSharedstreetsLayer(deckGlLayers) {
+      const {
+        visStateActions
+      } = this.props;
+      
+      return new SharedstreetsLayer({
+        id: 'sharedstreet',
+        addTiledDatasetSample: visStateActions.addTiledDatasetSample,
+        layers: deckGlLayers
+      })
     }
 
     _renderMapboxLayers() {
