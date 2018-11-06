@@ -338,7 +338,8 @@ export default function MapContainerFactory(MapPopover, MapControl) {
           .reduce(this._renderLayer, []);
       }
 
-      const tiledDataLayers = deckGlLayers.filter(layer => {
+      const tiledSampleSSDataLayer = deckGlLayers.filter(layer => {
+        // layers that render sample sharedstreets tiled data.
         // TODO
         return true;
       });
@@ -348,7 +349,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
         return false;
       });
 
-      layersToRender.push(this._renderSharedstreetsLayer(tiledDataLayers));
+      layersToRender.push(this._renderSharedstreetsLayer(tiledSampleSSDataLayer));
 
       return (
         <DeckGL
@@ -363,7 +364,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
       );
     }
 
-    _renderSharedstreetsLayer(deckGlLayers) {
+    _renderSharedstreetsLayer(tiledSampleLayers) {
       const {
         visStateActions
       } = this.props;
@@ -371,7 +372,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
       return new SharedstreetsLayer({
         id: 'sharedstreet',
         addTiledDatasetSample: visStateActions.addTiledDatasetSample,
-        layers: deckGlLayers
+        tiledSampleLayers
       })
     }
 

@@ -29,7 +29,7 @@ import dataProcessor from 'processors';
 export default class SharedstreetsLayer extends CompositeLayer {
   initializeState() {
     this.setState({
-      sendSampleData: false
+      isTiledSampleDataLoaded: false
     })
   }
 
@@ -48,23 +48,22 @@ export default class SharedstreetsLayer extends CompositeLayer {
     })
     .then(buffer => {
       const geoJson = geobuf.decode(new Pbf(buffer));
-      if (!this.state.sendSampleData) {
+      if (!this.state.isTiledSampleDataLoaded) {
         this.props.addTiledDatasetSample('sharedstreets', dataProcessor.processGeojson(geoJson));
         this.setState({
-          sendSampleData: true
+          isTiledSampleDataLoaded: true
         });
       }
       return geoJson;
     });
   }
   
-  renderSubLayers(props) {
-    return this.props.layers.map(layer => {
-      const layerProps = layer.props;
+  renderSubLayers(subLayerProps) {
+    return this.props.tiledSampleLayers.map(layer => {
       return new layer.constructor({
-        ...layerProps,
-        ...props,
-        id: `${props.id}-${layer.id}`
+        ...layer.props,
+        ...subLayerProps,
+        id: `${subLayerProps.id}-${layer.id}`
       });
     })
   }
