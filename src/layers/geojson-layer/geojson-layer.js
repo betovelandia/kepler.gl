@@ -243,9 +243,11 @@ export default class GeoJsonLayer extends Layer {
     
     // get all the field
     const fields = [];
-    Object.keys(allData[0][0].properties).forEach(key => {
-      fields.push(key);
-    });
+    if (allData && allData[0] && allData[0][0] && allData[0][0].properties) {
+      Object.keys(allData[0][0].properties).forEach(key => {
+        fields.push(key);
+      });
+    }
 
     function getDataFromGeoJsonFeature(feature) {
       const data = [];
