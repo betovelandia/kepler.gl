@@ -247,21 +247,25 @@ export default class GeoJsonLayer extends Layer {
       fields.push(key);
     });
 
+    function getDataFromGeoJsonFeature(feature) {
+      const data = [];
+      data[0] = feature;
+      for (let i = 0; i < fields.length; i++) {
+        data.push(feature.properties[fields[i]]);
+      }
+      return data;
+    }
+
     return {
       data: geojsonData,
       getFeature,
       getFillColor: d => {
-        const obj = [];
-        obj[0] = d;
-        for (let i = 0; i < fields.length; i++) {
-          obj.push(d.properties[fields[i]]);
-        }
         return cScale
           ? this.getEncodedChannelValue(
               cScale,
               // if it's tiled data, allData only contains a sample
               // we need to calculate the correct data
-              allData[d.properties.index] || obj, 
+              this.isTiled ? getDataFromGeoJsonFeature(d) : allData[d.properties.index], 
               colorField
             )
           : d.properties.fillColor || color
@@ -270,7 +274,7 @@ export default class GeoJsonLayer extends Layer {
         cScale
           ? this.getEncodedChannelValue(
               cScale,
-              allData[d.properties.index],
+              this.isTiled ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
               colorField
             )
           : d.properties.lineColor || color,
@@ -278,7 +282,7 @@ export default class GeoJsonLayer extends Layer {
         sScale
           ? this.getEncodedChannelValue(
               sScale,
-              allData[d.properties.index],
+              this.isTiled ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
               sizeField,
               0
             )
@@ -287,21 +291,16 @@ export default class GeoJsonLayer extends Layer {
         eScale
           ? this.getEncodedChannelValue(
               eScale,
-              allData[d.properties.index],
+              this.isTiled ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
               heightField,
               0
             )
           : d.properties.elevation || 500,
       getRadius: d => {
-        const obj = [];
-        obj[0] = d;
-        fields.forEach(field => {
-          obj.push(d.properties[field]);
-        });
         return rScale
           ? this.getEncodedChannelValue(
               rScale,
-              allData[d.properties.index] || obj,
+              this.isTiled ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
               radiusField,
               0
             )

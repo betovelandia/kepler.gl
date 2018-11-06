@@ -37,7 +37,7 @@ export function findDefaultLayer(dataset, layerClasses) {
     const layerProps = layerClasses[lc].findDefaultLayerProps(dataset);
     if (layerProps) {
       const found = (Array.isArray(layerProps) ? layerProps : [layerProps])
-        .map(props => new layerClasses[lc]({...props, dataId: dataset.id}));
+        .map(props => new layerClasses[lc]({...props, dataId: dataset.id, isTiled: dataset.isTiled}));
       layers = layers.concat(found);
     }
   });

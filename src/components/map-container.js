@@ -322,6 +322,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
     _renderOverlay() {
       const {
         mapState,
+        layers,
         layerData,
         layerOrder,
         visStateActions
@@ -338,15 +339,13 @@ export default function MapContainerFactory(MapPopover, MapControl) {
           .reduce(this._renderLayer, []);
       }
 
-      const tiledSampleSSDataLayer = deckGlLayers.filter(layer => {
+      const tiledSampleSSDataLayer = deckGlLayers.filter(deckGlLayer => {
         // layers that render sample sharedstreets tiled data.
-        // TODO
-        return true;
+        return layers.some(keplerGlLayer => keplerGlLayer.id === deckGlLayer.id && keplerGlLayer.isTiled);
       });
 
       const layersToRender = deckGlLayers.filter(layer => {
-        // TODO
-        return false;
+        return tiledSampleSSDataLayer.includes(layer);
       });
 
       layersToRender.push(this._renderSharedstreetsLayer(tiledSampleSSDataLayer));

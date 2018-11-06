@@ -1082,7 +1082,10 @@ export function addTiledDatasetSampleUpdater(state, action) {
   const {dataId, data} = action;
   const visState = updateVisDataUpdater(state, {
     datasets: {
-      info: dataId,
+      info: {
+        id: dataId,
+        isTiled: true
+      },
       data
     }, 
     options: {centerMap: true}, 
