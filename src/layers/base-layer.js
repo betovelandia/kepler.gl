@@ -90,7 +90,6 @@ export default class Layer {
       columns: this.getLayerColumns(),
       ...props
     });
-    this.isTiled = props.isTiled;
   }
 
   get layerIcon() {

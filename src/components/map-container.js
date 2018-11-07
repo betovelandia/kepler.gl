@@ -321,6 +321,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
 
     _renderOverlay() {
       const {
+        datasets,
         mapState,
         layers,
         layerData,
@@ -339,16 +340,40 @@ export default function MapContainerFactory(MapPopover, MapControl) {
           .reduce(this._renderLayer, []);
       }
 
-      const tiledSampleSSDataLayer = deckGlLayers.filter(deckGlLayer => {
-        // layers that render sample sharedstreets tiled data.
-        return layers.some(keplerGlLayer => keplerGlLayer.id === deckGlLayer.id && keplerGlLayer.isTiled);
+      // tiled datasource id maps to deckgl layers with sample data
+      const tiledDataToLayers = new Map();
+      const tiledDatasets = Object.keys(datasets).filter(dataId => datasets[dataId].isTiled);
+      
+      // TODO: should have UI that add tiled dataset
+      tiledDatasets.push('sharedstreets');
+
+      tiledDatasets.forEach(tiledDataset => tiledDataToLayers.set(tiledDataset, []));
+
+      const layersWithTiledData = new Set();
+
+      Object.keys(datasets).forEach(dataId => {
+        const isTiledData = datasets[dataId].isTiled;
+        if (isTiledData) {
+          layers.forEach(layer => {
+            if (layer.config.dataId === dataId) {
+              // find its corresponding deckgl layer
+              const sampleDataLayer = deckGlLayers.find(deckGLLayer => deckGLLayer.id === layer.id);
+              layersWithTiledData.add(sampleDataLayer);
+              tiledDataToLayers.get(dataId).push(sampleDataLayer);
+            }
+          })
+        }        
       });
 
-      const layersToRender = deckGlLayers.filter(layer => {
-        return tiledSampleSSDataLayer.includes(layer);
-      });
+      // renders layers by data sources
+      const layersToRender = deckGlLayers.filter(layer => !layersWithTiledData.has(layer));
 
-      layersToRender.push(this._renderSharedstreetsLayer(tiledSampleSSDataLayer));
+      tiledDataToLayers.forEach((tiledDataLayers, tiledDataId) => {
+        if (tiledDataId === 'sharedstreets') {
+          const sharedstreetsLayers = this._renderSharedstreetsLayer(tiledDataLayers);
+          layersToRender.push(sharedstreetsLayers);
+        }
+      });
 
       return (
         <DeckGL
@@ -367,7 +392,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
       const {
         visStateActions
       } = this.props;
-      
+
       return new SharedstreetsLayer({
         id: 'sharedstreet',
         addTiledDatasetSample: visStateActions.addTiledDatasetSample,

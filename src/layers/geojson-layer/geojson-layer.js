@@ -162,7 +162,7 @@ export default class GeoJsonLayer extends Layer {
     return allData[object.properties.index];
   }
 
-  formatLayerData(_, allData, filteredIndex, oldLayerData, opt = {}) {
+  formatLayerData(_, allData, filteredIndex, oldLayerData, opt = {}, isTiledData) {
     const {
       colorScale,
       colorField,
@@ -267,7 +267,7 @@ export default class GeoJsonLayer extends Layer {
               cScale,
               // if it's tiled data, allData only contains a sample
               // we need to calculate the correct data
-              this.isTiled ? getDataFromGeoJsonFeature(d) : allData[d.properties.index], 
+              isTiledData ? getDataFromGeoJsonFeature(d) : allData[d.properties.index], 
               colorField
             )
           : d.properties.fillColor || color
@@ -276,7 +276,7 @@ export default class GeoJsonLayer extends Layer {
         cScale
           ? this.getEncodedChannelValue(
               cScale,
-              this.isTiled ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
+              isTiledData ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
               colorField
             )
           : d.properties.lineColor || color,
@@ -284,7 +284,7 @@ export default class GeoJsonLayer extends Layer {
         sScale
           ? this.getEncodedChannelValue(
               sScale,
-              this.isTiled ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
+              isTiledData ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
               sizeField,
               0
             )
@@ -293,7 +293,7 @@ export default class GeoJsonLayer extends Layer {
         eScale
           ? this.getEncodedChannelValue(
               eScale,
-              this.isTiled ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
+              isTiledData ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
               heightField,
               0
             )
@@ -302,7 +302,7 @@ export default class GeoJsonLayer extends Layer {
         return rScale
           ? this.getEncodedChannelValue(
               rScale,
-              this.isTiled ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
+              isTiledData ? getDataFromGeoJsonFeature(d) : allData[d.properties.index],
               radiusField,
               0
             )
