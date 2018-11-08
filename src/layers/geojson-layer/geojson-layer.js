@@ -244,15 +244,14 @@ export default class GeoJsonLayer extends Layer {
     return {
       data: geojsonData,
       getFeature,
-      getFillColor: d => {
-        return cScale
+      getFillColor: d => 
+        cScale
           ? this.getEncodedChannelValue(
               cScale,
               allData[d.properties.index], 
               colorField
             )
-          : d.properties.fillColor || color
-      },
+          : d.properties.fillColor || color,
       getLineColor: d =>
         cScale
           ? this.getEncodedChannelValue(
@@ -279,8 +278,8 @@ export default class GeoJsonLayer extends Layer {
               0
             )
           : d.properties.elevation || 500,
-      getRadius: d => {
-        return rScale
+      getRadius: d => 
+        rScale
           ? this.getEncodedChannelValue(
               rScale,
               allData[d.properties.index],
@@ -288,7 +287,6 @@ export default class GeoJsonLayer extends Layer {
               0
             )
           : d.properties.radius || 1
-      }
     };
   }
 

@@ -362,7 +362,6 @@ export default function MapContainerFactory(MapPopover, MapControl) {
         }
       });
 
-      // renders layers by data sources
       const layersToRender = deckGlLayers.filter(layer => !layersWithTiledData.has(layer));
 
       tiledDataToLayers.forEach((tiledDataLayers, tiledDataId) => {
