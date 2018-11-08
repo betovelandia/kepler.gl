@@ -29,7 +29,8 @@ import dataProcessor from 'processors';
 export default class SharedstreetsLayer extends CompositeLayer {
   initializeState() {
     this.setState({
-      isTiledSampleDataLoaded: false
+      isTiledSampleDataLoaded: false,
+      sampleDataSize: 0
     })
   }
 
@@ -48,19 +49,26 @@ export default class SharedstreetsLayer extends CompositeLayer {
     })
     .then(buffer => {
       const geoJson = geobuf.decode(new Pbf(buffer));
+      const geoJsonLength = geoJson.features.length;
       if (!this.state.isTiledSampleDataLoaded) {
         this.props.addTiledDatasetSample('sharedstreets', dataProcessor.processGeojson(geoJson));
         this.setState({
-          isTiledSampleDataLoaded: true
+          isTiledSampleDataLoaded: true,
+          sampleDataSize: geoJsonLength
         });
+      } else {
+        for (let i = 0; i < geoJsonLength; i++) {
+          // HACK: make sure the data is the same as KeplerGL layer data.
+          geoJson.features[i].properties.index = i % this.state.sampleDataSize;
+        }
       }
       return geoJson;
     });
   }
   
   renderSubLayers(subLayerProps) {
-    return this.props.tiledSampleLayers.map(layer => {
-      return new layer.constructor({
+    return this.props.tiledSampleLayers && this.props.tiledSampleLayers.map(layer => {
+      return layer && new layer.constructor({
         ...layer.props,
         ...subLayerProps,
         id: `${subLayerProps.id}-${layer.id}`

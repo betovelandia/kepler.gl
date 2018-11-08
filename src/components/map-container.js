@@ -351,18 +351,15 @@ export default function MapContainerFactory(MapPopover, MapControl) {
 
       const layersWithTiledData = new Set();
 
-      Object.keys(datasets).forEach(dataId => {
-        const isTiledData = datasets[dataId].isTiled;
-        if (isTiledData) {
-          layers.forEach(layer => {
-            if (layer.config.dataId === dataId) {
-              // find its corresponding deckgl layer
-              const sampleDataLayer = deckGlLayers.find(deckGLLayer => deckGLLayer.id === layer.id);
-              layersWithTiledData.add(sampleDataLayer);
-              tiledDataToLayers.get(dataId).push(sampleDataLayer);
-            }
-          })
-        }        
+      layers.forEach(layer => {
+        const dataId = layer.config.dataId;
+        const isTiledDataset = datasets[dataId].isTiled;
+        if (isTiledDataset) {
+          // find its corresponding deckgl layer
+          const sampleDataLayer = deckGlLayers.find(deckGLLayer => deckGLLayer.id === layer.id);
+          layersWithTiledData.add(sampleDataLayer);
+          tiledDataToLayers.get(dataId).push(sampleDataLayer);
+        }
       });
 
       // renders layers by data sources
